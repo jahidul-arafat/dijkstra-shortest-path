@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijkstra's Algorithm Shortest Path Visualization</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+    <link href="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.css" rel="stylesheet" type="text/css"/>
+    <!-- Load the external CSS file -->
+    <link href="styles.css" rel="stylesheet" type="text/css"/>
+    <!-- Load the JavaScript file after DOM has loaded -->
+    <script src="dijkstra_graph.min.js" defer></script>
+
+</head>
+<body>
+<div class="container">
+    <h1>Dijkstra's Algorithm - Shortest Path Visualization</h1>
+    <h5 style="margin-bottom: 0;">By Jahidul Arafat, Presidential Graduate Research Fellow, CSSE, AU, USA; (ex) L3 Sr. Solution Architect, Oracle</h5>
+    <p style="text-align: center; margin-top: 0;">
+        <a href="https://www.linkedin.com/in/jahidul-arafat-presidential-fellow-phd-student-791a7490/" target="_blank">https://www.linkedin.com/in/jahidul-arafat-presidential-fellow-phd-student-791a7490/</a>
+    </p>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="demo">Default Graph Demo</div>
+        <div class="tab" data-tab="custom">Custom Graph Builder</div>
+    </div>
+
+    <div class="tab-content active" id="demo-content">
+        <div class="explanation">
+            <p>Dijkstra's algorithm finds the shortest path between nodes in a graph. It works by keeping track of the currently known shortest distance from the starting node to all other nodes and updating these values as shorter paths are found.</p>
+            <div class="row" style="justify-content: center;">
+                <div>
+                    <strong>Source node:</strong> <span id="source-node">A</span>
+                </div>
+                <div style="margin-left: 20px;">
+                    <strong>Destination node:</strong> <span id="destination-node">F</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+            <div id="original-graph" class="graph-container">
+                <h2>Original Graph</h2>
+            </div>
+            <div id="shortest-path-graph" class="graph-container">
+                <h2>Shortest Path Construction (Current Step)</h2>
+            </div>
+        </div>
+
+        <div class="step-info">
+            <span class="step-number">Step: <span id="step-counter">0</span></span>
+            <div id="step-description"></div>
+        </div>
+
+        <div class="distance-table">
+            <h3>Current Distance Table</h3>
+            <table id="distance-table">
+                <thead>
+                <tr>
+                    <th>Node</th>
+                    <th>Distance from Source</th>
+                    <th>Previous Node</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Table rows will be added dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="controls">
+            <button id="prev-step" disabled>Previous Step</button>
+            <button id="next-step">Next Step</button>
+            <button id="restart">Restart</button>
+        </div>
+
+        <div class="state-table">
+            <h3>Shortest Path</h3>
+            <table id="path-table">
+                <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>Node Added</th>
+                    <th>Current Distance</th>
+                    <th>Path</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Table rows will be added dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content" id="custom-content">
+        <div class="explanation">
+            <p>Create your own graph below. Add nodes, then add edges between them with weights. When you're ready, run Dijkstra's algorithm to find the shortest path.</p>
+        </div>
+
+        <div class="graph-editor">
+            <h3>Graph Editor</h3>
+
+            <div class="node-editor">
+                <h4>Add/Remove Nodes</h4>
+                <div class="row">
+                    <label for="node-id">Node ID:</label>
+                    <input type="text" id="node-id" maxlength="3" value="A">
+                    <button id="add-node">Add Node</button>
+                    <button id="remove-node" class="danger-button">Remove Node</button>
+                </div>
+            </div>
+
+            <div class="edge-editor">
+                <h4>Add/Remove Edges</h4>
+                <div class="row">
+                    <label for="edge-from">From Node:</label>
+                    <input type="text" id="edge-from" maxlength="3" value="A">
+                </div>
+                <div class="row">
+                    <label for="edge-to">To Node:</label>
+                    <input type="text" id="edge-to" maxlength="3" value="B">
+                </div>
+                <div class="row">
+                    <label for="edge-weight">Weight:</label>
+                    <input type="number" id="edge-weight" min="1" step="1" value="1">
+                </div>
+                <div class="row">
+                    <button id="add-edge">Add Edge</button>
+                    <button id="remove-edge" class="danger-button">Remove Edge</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <button id="clear-graph" class="danger-button">Clear Graph</button>
+                <select id="graph-type" class="graph-type-select">
+                    <option value="original">Original Graph</option>
+                    <option value="small-graph">Small Graph</option>
+                    <option value="city-network">City Network</option>
+                    <option value="grid-network">Grid Network</option>
+                </select>
+                <button id="load-default">Load Selected Graph</button>
+            </div>
+        </div>
+
+        <div id="custom-graph" class="graph-container" style="height: 500px;">
+            <h3>Your Custom Graph</h3>
+        </div>
+
+        <div class="start-node-selector">
+            <label for="start-node">Source Node for Dijkstra's Algorithm:</label>
+            <select id="start-node">
+                <option value="A">A</option>
+            </select>
+
+            <label for="end-node" style="margin-left: 20px;">Destination Node:</label>
+            <select id="end-node">
+                <option value="A">A</option>
+            </select>
+        </div>
+
+        <div class="controls">
+            <button id="run-dijkstra">Run Dijkstra's Algorithm</button>
+        </div>
+
+        <!-- Legend for the visualization -->
+        <div class="legend">
+            <h3>Visualization Legend</h3>
+            <div class="legend-container">
+                <div class="legend-section">
+                    <h4>Node Colors</h4>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #3f51b5; border: 2px solid #303f9f;"></div>
+                        <div class="legend-label">Source Node</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f44336; border: 2px solid #d32f2f;"></div>
+                        <div class="legend-label">Destination Node</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4CAF50; border: 2px solid #2E7D32;"></div>
+                        <div class="legend-label">Visited Node (Finalized)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #9C27B0; border: 2px solid #7B1FA2;"></div>
+                        <div class="legend-label">Current Node</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FFC107; border: 2px solid #FFA000;"></div>
+                        <div class="legend-label">Node in Queue (Not Yet Visited)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #666666; border: 2px solid #444444;"></div>
+                        <div class="legend-label">Unexplored Node</div>
+                    </div>
+                </div>
+                <div class="legend-section">
+                    <h4>Edge Colors</h4>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background-color: #4CAF50;"></div>
+                        <div class="legend-label">Edge in Current Shortest Path</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background-color: #9C27B0;"></div>
+                        <div class="legend-label">Edge Being Explored</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line dashed" style="background-color: #FFA000;"></div>
+                        <div class="legend-label">Edge to Neighbor (Being Considered)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background-color: #666666;"></div>
+                        <div class="legend-label">Original Graph Edge</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="custom-results">
+            <h3>Dijkstra's Algorithm Results</h3>
+            <div id="custom-shortest-path-graph" class="graph-container">
+                <h3>Final Shortest Path</h3>
+            </div>
+
+            <div class="state-table">
+                <h3>Shortest Path Details</h3>
+                <table id="custom-path-table">
+                    <thead>
+                    <tr>
+                        <th>Node</th>
+                        <th>Distance from Source</th>
+                        <th>Path</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Table rows will be added dynamically -->
+                    </tbody>
+                </table>
+
+                <div id="custom-path-info" class="explanation" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
